@@ -7,9 +7,14 @@ public class News : MonoBehaviour
 {
     [SerializeField] private TMP_Text newsText;
     [SerializeField] private Transform newsTextTransform;
-    [SerializeField] private float newsWaitTime;
+    [SerializeField] private Vector3 startPosition;
+    [SerializeField] private Vector3 speed;
+
+    [SerializeField] [Tooltip("In seconds")]
+    private float letterReadingTime;
 
     private string[] _newsLines;
+    private float _newsWaitTime;
 
     private void Start()
     {
@@ -20,8 +25,21 @@ public class News : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(newsWaitTime);
-            newsText.text = _newsLines[Random.Range(0, _newsLines.Length)];
+            var randomNews = GetRandomNews();
+            _newsWaitTime = randomNews.Length * letterReadingTime;
+            newsText.text = randomNews;
+            newsTextTransform.localPosition = startPosition;
+            yield return new WaitForSeconds(_newsWaitTime);
         }
+    }
+
+    private string GetRandomNews()
+    {
+        return _newsLines[Random.Range(0, _newsLines.Length)];
+    }
+
+    private void Update()
+    {
+        newsTextTransform.Translate(speed * Time.deltaTime);
     }
 }
