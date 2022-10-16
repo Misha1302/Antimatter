@@ -9,6 +9,7 @@ public class News : MonoBehaviour
     [SerializeField] private Transform newsTextTransform;
     [SerializeField] private Vector3 startPosition;
     [SerializeField] private Vector3 speed;
+    [SerializeField] private float timeOffset;
 
     [SerializeField] [Tooltip("In seconds")]
     private float letterReadingTime;
@@ -20,15 +21,19 @@ public class News : MonoBehaviour
     {
         _newsLines = File.ReadAllText(@"src\News.txt").Split('\n');
         StartCoroutine(NewsUpdate());
-    } // ReSharper disable IteratorNeverReturns
+    }
+
     private IEnumerator NewsUpdate()
     {
+        // ReSharper disable IteratorNeverReturns
         while (true)
         {
-            var randomNews = GetRandomNews();
-            _newsWaitTime = randomNews.Length * letterReadingTime;
+            var randomNews = GetRandomNews(); // "Как выйти из Vim?\r";
+            _newsWaitTime = randomNews.Length * letterReadingTime + timeOffset;
+
             newsText.text = randomNews;
             newsTextTransform.localPosition = startPosition;
+
             yield return new WaitForSeconds(_newsWaitTime);
         }
     }
@@ -38,8 +43,8 @@ public class News : MonoBehaviour
         return _newsLines[Random.Range(0, _newsLines.Length)];
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        newsTextTransform.Translate(speed * Time.deltaTime);
+        newsTextTransform.Translate(speed);
     }
 }
